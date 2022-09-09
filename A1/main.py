@@ -1,50 +1,56 @@
+from cmath import nan
 import sympy as sym
-from utils import *
-v = sym.Symbol('v')
-
-class a1:
-    global eps
-
-    def __init__(self):
-        pass
-
-    def taylor_roundoff():
-        pass
-
-    # Currently only handles one value of x.
-    def ndiff(fun, x, full=False):
-        # Have some code in here that determines whether eps is 10^-7 or 10^-16
-        if False: #type(fun).__name__ != 'sympy.core.mul.Mul':  # This code is to catch errors will need to be fixed
-            print("A function was not of the sympy library. Other function types are not supported.")
-            #TODO: return derivative, return error, return dx
-            return 0
-        else:
-            if full == False:
-                eps = 10**(-7)
-                fpp = fun.diff().diff()
-
-                # determine which of the core atttributes this is 
-                print(eps*fun.subs(v, x)/fpp.subs(v,x))
-                dx = np.sqrt(np.abs(eps*fun.subs(v, x)/fpp.subs(v,x)))
-                deriv = (fun.subs(v, x+dx)-fun.subs(v, x-dx))/(2*dx)
-                return deriv
-            else:
-                pass # Fill this in with the rest of the nonsense
-
-    def lakeshore(V, data):  # V is either a number or an array
-        pass
+import numpy as np
 
 
-# This is all for the question 4
-    def spline_comparison():
-        pass
+"""
+Question 2
+"""
+# Currently only handles one value of x.
+# QUESTIONS: What if f''' is zero? How should we approach that?
+def ndiff(fun, x, full=False):
+    eps = 10*(-7)
+    # calculate dx
+    f = float(fun.subs(fvar, x))  # Value of f(x)
+    fppp = fun.diff().diff().diff() # Calculating f'''
+    f3p = float(fppp.subs(fvar, x)) # Value of f'''(x)
     
-    def poly_spline():
-        pass
+    # if this does equal zero, the derivative would also automatically be equal to zero
+    if fppp.subs(fvar, x) != 0:
+        dx = np.cbrt(np.abs(f*eps/f3p))
+        print(dx)
 
-    def cubic_spline():
-        pass
+    # calculate the derivative
+    f_plus = float(fun.subs(fvar, x+dx))
+    f_minus = float(fun.subs(fvar,x-dx))
+    df = f_plus - f_minus
+    if dx != 0:
+        fp = df/(2*dx)
+    else:
+        if df < 0:
+            fp = float('-inf')
+        elif df > 0:
+            fp = float('inf')
+        else: 
+            fp = nan
+            print("The derivative of f at "+str(x)+" is undefined!")
+    print(fp)
 
-    def rational_interpol():
-        pass
+    if full == False:
+        return fp
+    else:
+        # add safety checks if 0 or +/- inf
+        # calculate rough error
+        deriv = fun.diff()
+        fp_actual = deriv.subs(fvar, x)
+        error = fp_actual - fp
+        return fp, dx, error
+        # return derivative, dx, rough error
 
+if __name__ == "__main__":
+    fvar = sym.Symbol("u")
+
+    func = sym.exp(fvar)
+    x = 0
+    q2 = ndiff(func, x)
+    print(q2)

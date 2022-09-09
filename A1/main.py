@@ -47,20 +47,4 @@ class a1:
 
     def rational_interpol():
         pass
-# print(sym.diff(v**5))
-
-# expr = sym.cos(v) + 1
-# print(expr.diff().diff())
-# print(expr.subs(v, 1))
-
-# # Can use has(v) to determine which variables are being used
-# arguments = expr.has(v)
-# print(arguments)
-
-func = sym.cos(v*v)
-x = 0 
-assignment = a1()
-
-val = a1.ndiff(func, x)
-print(val)
 

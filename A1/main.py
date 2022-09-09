@@ -47,6 +47,22 @@ def ndiff(fun, x, full=False):
         return fp, dx, error
         # return derivative, dx, rough error
 
+"""
+Question 3
+"""
+def lakeshore(V, data):
+    pass
+
+
+"""
+Question 4
+"""
+# interpolates for a single point
+def poly_interpol():
+    
+    pass
+
+
 if __name__ == "__main__":
     fvar = sym.Symbol("u")
 
@@ -54,3 +70,10 @@ if __name__ == "__main__":
     x = 0
     q2 = ndiff(func, x)
     print(q2)
+
+    # Question 4 answer
+    no_pts = 100
+    x = np.linspace(-np.pi/2, np.pi/2, no_pts)
+    y = np.cos(x)
+
+

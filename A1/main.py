@@ -3,7 +3,7 @@ import sympy as sym
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.interpolate import interp1d
+from scipy import interpolate
 
 """
 Question 2
@@ -56,7 +56,7 @@ Question 3
 def lakeshore(V, data):
     # Assuming that the data here is in the same format as the original file 
     voltage, temp = dat[:,1], dat[:,0]
-    f = interp1d(temp, voltage, kind='cubic') # interpolated function
+    f = interp1d(voltage, temp, kind='cubic') # interpolated function
 
     # is the input a list or a single value?
     if isinstance(V, float) or isinstance(V, int):
@@ -77,32 +77,61 @@ def lakeshore(V, data):
 
 """
 Question 4
+
+TODO:
+- Test all written interpolation methods
+- Poly interpol (done)
+- cubic interpol (done)
+- rational function interpol (done)
+- Lorentzian (between -1 and 1)
 """
 # interpolates for a single point
-def poly_interpol():
-    
-    pass
+def inter_compare(start, end, n: int, m: int, num_pts: int, func): # Make sure the function passed in is in a valid format 
+    x = np.linspace(start, end, n+m-1)
+    # Rational interpolation
+    p, q = rat_fit(x,func,n,m)
+    pred=rat_eval(p, q, x)
+
+    xx=np.linspace(start, end, num_pts)
+    yy_interp=rat_eval(p, q, xx) # Part of the code we want to plot
+    error_rat = yy_interp-func
+
+    # Polynomial interpolation
+    pp = np.polyfit(x, func, n+m)
+    yy_poly = np.polyval(pp, xx) # Want to plot
+    error_poly = yy_poly-func
+
+    # Cubic Spline
+    spln = interpolate.splrep(x, func)
+    yy_spline = interpolate.splev(xx, spln)
+    error_spline = yy_spline-func
+
+    # Plot all the errors together
 
 """
 Helper Functions
 """
-# Calculates the y_i given two lists of data using a Lagrange expansion.
-"""TODO: 
-- Add a check that ensures the lists are the same length (DONE)
-- Calculate the estimated uncertainty
-"""
-def lagrange_i(x_i, x_list, y_list):
-    y_i = 0
-    if len(x_list) == len(y_list):
-        for j in range(len(x_list)):
-            l = 1
-            for m in range(len(x_list)):
-                if m != j:
-                    l *= (x_i - x_list[m])/(x_list[j]-x_list[m])
-            y_i = y_i + y_list[j]*l
-    else: 
-        print("The lists are of different sizes. Ensure your data is correct and try again.")
-    return y_i
+def rat_fit(x, y, n, m):
+    assert(len(x)==n+m-1)
+    assert(len(x)==len(y))
+    mat=np.zeros([n+m-1, n+m-1])
+    for i in range(n):
+        mat[:,i]=x**i
+    for i in range(1, m):
+        mat[:,i-1+n]=-y*x**i
+    pars=np.dot(np.linalg.inv(mat),y)
+    p = pars[:n]
+    q=pars[n:]
+    return p,q
+
+def rat_eval(p, q, x):
+    top=0
+    for i in range(len(p)):
+        top=top+p[i]*x**i
+    bot=1
+    for i in range(len(q)):
+        bot=bot+q[i]*x**(i+1)
+    return top/bot
 
 
 if __name__ == "__main__":
@@ -119,28 +148,20 @@ if __name__ == "__main__":
     # Question 3 Answer 
     dat = np.loadtxt('./lakeshore.txt') # Might be good practice to add a try and catch statement here
     # Temperature | Voltage | dV/dT // Plot of the data
-    print(dat)
     voltage, temp = dat[:,1], dat[:,0]
 
     # Debugging
     print("voltage:", voltage, "\n")
     print("temperature:", temp, "\n")
-    v = 1.3
-    # The order of these inputs is correct
-
-    f = interp1d(temp, voltage, kind='cubic')
-    print(f(1.7))
-    voltage_num = 2.0
+    voltage_num = 0.5
     vals, error = lakeshore(voltage_num, dat)
     print(vals, error)
-    # plt.plot(voltage, temp, 'o', f(temp), voltage, '-')
-    # plt.show()
-
+    plt.plot(voltage, temp)
+    plt.plot(voltage_num, vals, marker='*', ls='none', ms=20)
+    plt.show()
 
 
     # Question 4 Answer
     no_pts = 100
     x = np.linspace(-np.pi/2, np.pi/2, no_pts)
     y = np.cos(x)
-
-

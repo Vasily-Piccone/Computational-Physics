@@ -4,10 +4,22 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import interpolate
-from scipy.interpolate import interp1d
+from scipy.interpolate import UnivariateSpline, interp1d
+
+
 """
 Question 1
 """
+# Returns the optimal error for the functions men
+def opt_errors():
+    eps = 10**(-15)
+    # Calculate optimal errors using the calculated optimal dx
+    g_r = np.random.randint(1, 9)
+    print(g_r)
+    dx1, dx2 = np.cbrt(3*eps*g_r), np.cbrt(3*g_r*eps/(0.01)**3) # Optimal dx's 
+    opt_err1, opt_err2 = (g_r*eps)/dx1 +(dx1)**2/6, (g_r*eps)/dx2 +((0.01)**3)*(dx2)**2/(6)
+    return opt_err1, dx1, opt_err2, dx2
+
 def plot_errors(num_pts):
     min_dx_order = -8
     max_dx_order= -3
@@ -17,10 +29,6 @@ def plot_errors(num_pts):
     g = np.random.randint(1, 9, num_pts) # Random order unity integers
     err1 = (g*eps)/dx + (dx)**2/6
     err2 = (g*eps)/dx +(dx)**2/(6*(0.01)**3)
-    g_r = np.random.randint(1, 9)
-    print(g_r)
-    opt_err1 = (g*eps)/dx +(dx)**2/(6*(0.01)**3)
-    opt_err2 = (g*eps)/dx +(dx)**2/(6*(0.01)**3)
     return err1, err2, dx
 
 """
@@ -29,20 +37,14 @@ Question 2
 # Currently only handles one value of x.
 # QUESTIONS: What if f''' is zero? How should we approach that?
 def ndiff(fun, x, full=False):
-    eps = 10*(-7)
+    eps = 10*(-15)
+    g = np.random.randint(1, 9)
     # calculate dx
-    f = float(fun.subs(fvar, x))  # Value of f(x)
-    fppp = fun.diff().diff().diff() # Calculating f'''
-    f3p = float(fppp.subs(fvar, x)) # Value of f'''(x)
+    dx = np.cbrt(3*g*eps)
     
-    # if this does equal zero, the derivative would also automatically be equal to zero
-    if fppp.subs(fvar, x) != 0:
-        dx = np.cbrt(np.abs(f*eps/f3p))
-        print(dx)
-
     # calculate the derivative
-    f_plus = float(fun.subs(fvar, x+dx))
-    f_minus = float(fun.subs(fvar,x-dx))
+    f_plus = float(fun(x+dx))
+    f_minus = float(fun(x-dx))
     df = f_plus - f_minus
     if dx != 0:
         fp = df/(2*dx)
@@ -56,14 +58,11 @@ def ndiff(fun, x, full=False):
             print("The derivative of f at "+str(x)+" is undefined!")
     print(fp)
 
+    # Assuming dx is small, only the 1/dx term will dominate
     if full == False:
         return fp
     else:
-        # add safety checks if 0 or +/- inf
-        # calculate rough error
-        deriv = fun.diff()
-        fp_actual = deriv.subs(fvar, x)
-        error = fp_actual - fp
+        error = g*eps/dx
         return fp, dx, error
         # return derivative, dx, rough error
 
@@ -73,12 +72,14 @@ Question 3
 # Is the V value provided included in the provided data? If not, throw an error -> Add proper error handling
 def lakeshore(V, data):
     # Assuming that the data here is in the same format as the original file 
-    voltage, temp = dat[:,1], dat[:,0]
-    f = interp1d(voltage, temp, kind='cubic') # interpolated function
+    voltage, temp, dV = data[:,1], data[:,0], data[:,2]
+    f = UnivariateSpline(temp, voltage) # interpolated function
+    fp_real = f.derivative()
+    fp_inter = UnivariateSpline(temp, dV)
 
     # is the input a list or a single value?
     if isinstance(V, float) or isinstance(V, int):
-        error = 0 # Define the calculation for this 
+        error = fp_real(V) - fp_inter(V)
         t = f(V) # Calculate temperature
         return t, error
     elif isinstance(V,(list,pd.core.series.Series,np.ndarray)):
@@ -87,6 +88,7 @@ def lakeshore(V, data):
         # for each number in the list, interpolate
         for val in V:
             t_list.append(f(val))
+            error.append(fp_real(val) - fp_inter(val))
         return t_list, error
     else:
         print("Please ensure that V is a list, an np.array, or a pandas array")
@@ -107,6 +109,7 @@ TODO:
     - Can you understand what has happened 
 """
 # interpolates for a single point
+# Please note the code for the interpolation methods is the same code from the lectures
 def inter_compare(start, end, n: int, m: int, num_pts: int, func): # Make sure the function passed in is in a valid format 
     x = np.linspace(start, end, n+m-1)
     # Rational interpolation
@@ -148,7 +151,7 @@ def rat_fit(x, y, n, m):
         mat[:,i-1+n]=-y*x**i
     print(mat)
     pars=np.dot(np.linalg.pinv(mat),y)
-    p = pars[:n]
+    p=pars[:n]
     q=pars[n:]
     return p,q
 
@@ -167,21 +170,32 @@ def lorentzian(x):
 if __name__ == "__main__":
 
     # Question 1 Answer 
-    err1, err2, dx = plot_errors(100)
-    print(err1)
-    print("\n")
-    print(err2)
-    plt.loglog(dx, err1, dx, err2)
-    plt.legend(['Error','Optimal dx'])
-    plt.show()
+
+    # err1, err2, dx = plot_errors(1000)
+    # opt_err1, dx1, opt_err2, dx2 = opt_errors()
+    # print(opt_err1, dx1, opt_err2, dx2)
+    # Add the optimum dx to the plot
+    # Fix the issue with the dx2
+
+    # print(err1)
+    # print("\n")
+    # print(err2)
+    # plt.loglog(dx, err2)
+    # plt.title("Error for e^(0.01x) vs. dx")
+    # plt.xlabel("dx")
+    # plt.ylabel("Error for e^(0.01x)")
+    # plt.plot(dx2, opt_err2, marker="o", markersize=5, markeredgecolor="red", markerfacecolor="green")
+    # plt.legend(['Error','Optimal dx'])
+    # plt.show()
+
 
     # Question 2 Answer (Fix question 2)
     # fvar = sym.Symbol("u")
 
-    # # func = sym.exp(fvar)
-    # # x = 0
-    # # q2 = ndiff(func, x)
-    # # print(q2)
+    # func = sym.exp(fvar)
+    # x = 0
+    # q2 = ndiff(func, x)
+    # print(q2)
 
 
     # # Question 3 Answer 
@@ -189,7 +203,7 @@ if __name__ == "__main__":
     # # Temperature | Voltage | dV/dT // Plot of the data
     # voltage, temp = dat[:,1], dat[:,0]
 
-    # # Debugging
+    # Debugging
     # print("voltage:", voltage, "\n")
     # print("temperature:", temp, "\n")
     # voltage_num = 0.5
@@ -200,15 +214,17 @@ if __name__ == "__main__":
     # plt.show()
 
     # # Question 4 Answer
-    # no_pts = 101
-    # x = np.linspace(-np.pi/2, np.pi/2, no_pts)
-    # y = np.cos
+    no_pts = 101
+    x = np.linspace(-np.pi/2, np.pi/2, no_pts)
+    y = np.cos
 
-    # # Part a)
-    # # Prints out the plots
-    # inter_compare(-np.pi/2, np.pi/2, 4, 5, 101, y)
+    # Part a)
+    # Prints out the plots
+    inter_compare(-np.pi/2, np.pi/2, 4, 5, 101, y)
 
-    # # Part b)
-    # xb = np.linspace(-1, 1, no_pts)
-    # yb = lorentzian
-    # inter_compare(-1, 1, 4, 5, 101, yb)
+    # Part b)
+    xb = np.linspace(-1, 1, no_pts)
+    yb = lorentzian
+    inter_compare(-1, 1, 4, 5, 101, yb)
+
+    # When we switch from np.linalg.inv to np.lingalg.pinv we get a result that properly 

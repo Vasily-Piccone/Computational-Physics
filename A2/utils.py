@@ -70,3 +70,13 @@ Functions for Question 3
 """
 
 # a) 
+def log2fit():
+    x = np.linspace(-1, 1, 11)
+    y = np.log2((x+3)/4)
+    
+    log2coeffs=np.polynomial.chebyshev.chebfit(x,y, deg=10)
+    log2=np.polynomial.chebyshev.Chebyshev.fit(x,y, deg=10)
+    return x, log2
+    pass
+
+# b)

@@ -26,9 +26,9 @@ if __name__ == "__main__":
     - Add the coloumb potential
     ''' 
     # This currently shows the plot with the integrated solution using the scipy.integrate.quad method.
-    plt.plot(z_vec, scipy_ans)
-    # plt.plot(z_vec, )
-    plt.show()
+    # plt.plot(z_vec, scipy_ans)
+    # # plt.plot(z_vec, )
+    # plt.show()
 
     # Solution for Q2
 
@@ -38,8 +38,8 @@ if __name__ == "__main__":
     - Write out some more information here, and properly outline the solution of the problem
     - 
     """
-    x, log2 = log2fit()
-    print(log2)
-    plt.plot(x, log2(x))
-    plt.show()
-
+    # x, log2 = log2fit()
+    # print(log2)
+    # plt.plot(x, log2(x))
+    # plt.show()
+    mylog2(7)

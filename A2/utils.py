@@ -1,3 +1,4 @@
+from tokenize import Number
 import scipy
 import numpy as np
 
@@ -80,3 +81,10 @@ def log2fit():
     pass
 
 # b)
+def mylog2(num: Number):
+    if num <= 0:
+        print("This number is less than or equal to zero. Please try another number")
+    else:
+        mantissa, exp = np.frexp(num)
+        print(mantissa, exp)
+    pass

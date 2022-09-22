@@ -3,8 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-
-
 if __name__ == "__main__":
 
     # Solution for Q1
@@ -33,13 +31,13 @@ if __name__ == "__main__":
     # Solution for Q2
 
     # Solution for Q3 
-    """
-    TODO:
-    - Write out some more information here, and properly outline the solution of the problem
-    - 
-    """
-    # x, log2 = log2fit()
-    # print(log2)
-    # plt.plot(x, log2(x))
+    # Q3a)
+    x, y, value = log2fit(0.5, calc_val=True)
+    print(value)
+    # Uncomment this section to see the plot of log2 between 0.5 and 1
+    # plt.plot(x, y)
     # plt.show()
-    mylog2(7)
+
+    # Q3b)
+    value = mylog2(58)
+    print(value)

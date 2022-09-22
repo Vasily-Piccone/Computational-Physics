@@ -71,14 +71,28 @@ Functions for Question 3
 """
 
 # a) 
-def log2fit():
-    x = np.linspace(-1, 1, 11)
+def log2fit(value: Number, calc_val=False):
+    x = np.linspace(-1, 1, 1001)
     y = np.log2((x+3)/4)
-    
-    log2coeffs=np.polynomial.chebyshev.chebfit(x,y, deg=10)
-    log2=np.polynomial.chebyshev.Chebyshev.fit(x,y, deg=10)
-    return x, log2
-    pass
+    log2_val = 0
+
+    cheb_coeffs=np.polynomial.chebyshev.chebfit(x,y, deg=25)
+    cheb_new = []
+    # Remove the coefficients below the tolerated threshold of 10^(-6)
+    for coeff in cheb_coeffs:
+        if abs(coeff) > 10**(-6):
+            cheb_new.append(coeff)
+
+    # Convert the chebyshev coefficients to polynomial coefficients
+    poly_coeffs=np.polynomial.chebyshev.cheb2poly(cheb_new)
+    poly = np.polynomial.Polynomial(poly_coeffs)
+
+    # Re-shifting the x axis to be between 
+    x_p = (x+3)/4
+    y_cheb = poly(x)
+    if calc_val and (value >= 0.5 and value <= 1):
+        log2_val = poly(4*(value)-3)
+    return x_p, y_cheb, log2_val
 
 # b)
 def mylog2(num: Number):
@@ -86,5 +100,7 @@ def mylog2(num: Number):
         print("This number is less than or equal to zero. Please try another number")
     else:
         mantissa, exp = np.frexp(num)
-        print(mantissa, exp)
-    pass
+        # Since the mantissa will always be between 0.5 and 1, we can use our function which fits log2 between 0.5 and 1
+        x, y, a = log2fit(mantissa, calc_val=True)
+        val = a+exp
+        return val

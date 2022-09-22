@@ -114,8 +114,10 @@ def mylog2(num: Number):
         print("This number is less than or equal to zero. Please try another number")
     else:
         mantissa, exp = np.frexp(num)
+        mantissa2, exp2 = np.frexp(np.e)
         # Since the mantissa will always be between 0.5 and 1, we can use our function which fits log2 between 0.5 and 1
         x, y, a = log2fit(mantissa, calc_val=True)
-        x1, y1, b = log2fit(np.e, calc_val=True)
-        val = (a+exp)/b
+        x1, y1, b = log2fit(mantissa2, calc_val=True)
+        print(b)
+        val = (a+exp)/(b+exp2)
         return val

@@ -48,5 +48,5 @@ if __name__ == "__main__":
     # plt.show()
 
     # Q3b)
-    value = mylog2(58)
+    value = mylog2(np.e)
     print(value)

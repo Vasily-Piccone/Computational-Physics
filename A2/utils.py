@@ -59,9 +59,23 @@ def integration_coeffs_legendre(npt):
 """
 Functions for question 2 
 """
-
+# Edit such that the function is not evaluated at multiple points
 def integrate_adaptive(fun, a, b, tol, extra=None):
-    pass
+    print('calling function from ', a, b)
+    x=np.linspace(a,b,5)
+    dx=x[1]-x[0]
+    y=fun(x)
+    #do the 3-point integral
+    i1=(y[0]+4*y[2]+y[4])/3*(2*dx)
+    i2=(y[0]+4*y[1]+2*y[2]+4*y[3]+y[4])/3*dx
+    myerr=np.abs(i1-i2)
+    if myerr<tol:
+        return i2
+    else:
+        mid=(a+b)/2
+        int1=integrate(fun,a,mid,tol/2)
+        int2=integrate(fun,mid,b,tol/2)
+        return int1+int2
 
 
 

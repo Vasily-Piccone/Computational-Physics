@@ -6,27 +6,29 @@ import matplotlib.pyplot as plt
 if __name__ == "__main__":
 
     # Solution for Q1
-    z_vec = np.linspace(0, 10, 11) # Remember that this must contain the R value
+    z_vec = np.linspace(0, 100, 1001) # Remember that this must contain the R value
     a , b = 0, np.pi
     
     scipy_ans = []
     integrator_ans = []
     for zi in z_vec:
-        func = gen_dE(R=1, z=zi)
+        r = 3
+        func = gen_dE(R=r, z=zi)
         y1 = scipy.integrate.quad(func, a, b)
         # if zi != 0:
         #     y2 = integrate(func, a, b, 10**(-5))
         #     integrator_ans.append(y2)  
-        scipy_ans.append(y1[0])
+        scipy_ans.append(r**2*y1[0])
+    
     '''
     TODO: 
     - Add the integrator method result 
     - Add the coloumb potential
     ''' 
     # This currently shows the plot with the integrated solution using the scipy.integrate.quad method.
-    # plt.plot(z_vec, scipy_ans)
+    plt.plot(z_vec, scipy_ans)
     # # plt.plot(z_vec, )
-    # plt.show()
+    plt.show()
 
     # Solution for Q2
 

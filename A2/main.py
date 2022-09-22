@@ -6,13 +6,19 @@ import matplotlib.pyplot as plt
 if __name__ == "__main__":
 
     # Solution for Q1
-    z_vec = np.linspace(0, 100, 1001) # Remember that this must contain the R value
+    z_vec = np.linspace(0, 10, 1001) # Remember that this must contain the R value
     a , b = 0, np.pi
-    
+    r = 3
+
     scipy_ans = []
     integrator_ans = []
+    coloumb_ans = np.zeros(1001)
+    for i in range(1001):
+        if z_vec[i] > r:
+            # This isn't the exact representation, but we're curious about qualitative behaviour
+            coloumb_ans[i] = 2*r**2/z_vec[i]**2 
+
     for zi in z_vec:
-        r = 3
         func = gen_dE(R=r, z=zi)
         y1 = scipy.integrate.quad(func, a, b)
         # if zi != 0:
@@ -26,8 +32,9 @@ if __name__ == "__main__":
     - Add the coloumb potential
     ''' 
     # This currently shows the plot with the integrated solution using the scipy.integrate.quad method.
-    plt.plot(z_vec, scipy_ans)
-    # # plt.plot(z_vec, )
+    plt.plot(z_vec, scipy_ans, label='Scipy answer')
+    plt.plot(z_vec, coloumb_ans, label='Analytic answer')
+    plt.legend(loc="upper left")
     plt.show()
 
     # Solution for Q2

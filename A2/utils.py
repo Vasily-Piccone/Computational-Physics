@@ -10,7 +10,7 @@ Functions for question 1
 def gen_dE(R, z):
     def dE(theta):
         radius = R
-        return (z-radius*np.cos(theta))*np.sin(theta)/(radius**2 + z**2 - 2*radius*z*np.cos(theta))
+        return (z-radius*np.cos(theta))*np.sin(theta)/(radius**2 + z**2 - 2*radius*z*np.cos(theta))**(3/2)
     return dE
 
 # The functions from this line to the functions for question 2 are taken from the class slides

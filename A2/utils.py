@@ -116,5 +116,6 @@ def mylog2(num: Number):
         mantissa, exp = np.frexp(num)
         # Since the mantissa will always be between 0.5 and 1, we can use our function which fits log2 between 0.5 and 1
         x, y, a = log2fit(mantissa, calc_val=True)
-        val = a+exp
+        x1, y1, b = log2fit(np.e, calc_val=True)
+        val = (a+exp)/b
         return val

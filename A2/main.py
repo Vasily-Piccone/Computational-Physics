@@ -13,22 +13,24 @@ if __name__ == "__main__":
     scipy_ans = []
     integrator_ans = []
     coloumb_ans = np.zeros(1001)
-    for i in range(1001):
-        if z_vec[i] > r:
-            # This isn't the exact representation, but we're curious about qualitative behaviour
-            coloumb_ans[i] = 2*r**2/z_vec[i]**2 
+    # for i in range(1001):
+    #     if z_vec[i] > r:
+    #         # This isn't the exact representation, but we're curious about qualitative behaviour
+    #         coloumb_ans[i] = 2*r**2/z_vec[i]**2 
 
     for zi in z_vec:
         func = gen_dE(R=r, z=zi)
         y1 = scipy.integrate.quad(func, a, b)
-        # if zi != 0:
-        #     y2 = integrate(func, a, b, 10**(-5))
-        #     integrator_ans.append(y2)  
+        if zi != 0:
+            y2 = integrate(func, a, b, 10**(-5))
+            integrator_ans.append(y2)  
         scipy_ans.append(r**2*y1[0])
     
     # This currently shows the plot with the integrated solution using the scipy.integrate.quad method.
     plt.plot(z_vec, scipy_ans, label='Scipy answer')
     plt.plot(z_vec, coloumb_ans, label='Analytic answer')
+    plt.xlabel("z distance")
+    plt.ylabel("field strength")
     plt.legend(loc="upper left")
     plt.show()
 

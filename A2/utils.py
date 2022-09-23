@@ -1,3 +1,4 @@
+from distutils.util import copydir_run_2to3
 from tokenize import Number
 import scipy
 import numpy as np
@@ -5,6 +6,7 @@ import numpy as np
 """
 Functions for question 1
 """
+int_calls, int_adapt_calls = 0, 0
 
 # Z is a number, the function we want will be returned as a function of u
 def gen_dE(R, z):
@@ -59,17 +61,23 @@ def integration_coeffs_legendre(npt):
 """
 Functions for question 2 
 """
-# Edit such that the function is not evaluated at multiple points
-def integrate_adaptive(fun, a, b, tol, extra=None):
-    print('calling function from ', a, b)
+# adaptive integrator function from class
+def integrate(fun,a,b,tol):
+    global int_calls
+
     x=np.linspace(a,b,5)
     dx=x[1]-x[0]
     y=fun(x)
     #do the 3-point integral
     i1=(y[0]+4*y[2]+y[4])/3*(2*dx)
     i2=(y[0]+4*y[1]+2*y[2]+4*y[3]+y[4])/3*dx
+
+    # Calculate how many times the function was called
+    int_calls += 5
+
     myerr=np.abs(i1-i2)
     if myerr<tol:
+        print("There were "+str(int_calls)+" function calls.")
         return i2
     else:
         mid=(a+b)/2
@@ -77,8 +85,40 @@ def integrate_adaptive(fun, a, b, tol, extra=None):
         int2=integrate(fun,mid,b,tol/2)
         return int1+int2
 
+# Edit such that the function is not evaluated at multiple points
+def integrate_adaptive(fun, a, b, tol, extra=None):
+    # A variable to account for how many times we called the function 'fun'
+    global int_adapt_calls 
+    x = np.linspace(a, b, 5)
 
+    if extra is None:
+        y = fun(x)
 
+        # increase the count as we did in the adaptive integrator function from class
+        int_adapt_calls += 5
+    else:
+        # provide the end points of the new region which have already been calculated
+        y = [extra[0], fun(x[1]), extra[1], fun(x[3]), extra[2]]
+
+        # increase the count of function evals by 2
+        int_adapt_calls += 2
+
+    # Setting up the integral as we did in class:
+    dx=x[1]-x[0]
+
+    #do the 3-point integral
+    i1=(y[0]+4*y[2]+y[4])/3*(2*dx)
+    i2=(y[0]+4*y[1]+2*y[2]+4*y[3]+y[4])/3*dx
+
+    # Definining the error
+    myerr=np.abs(i1-i2)
+
+    if myerr < tol:
+        print("There were "+str(int_adapt_calls)+" function calls.")
+        return i2
+    else:
+        left_area, right_area = integrate_adaptive(fun, a, x[2], tol/2, y[0:3]), integrate_adaptive(fun, x[2], b, tol/2, y[2:])
+        return left_area + right_area
 
 """
 Functions for Question 3

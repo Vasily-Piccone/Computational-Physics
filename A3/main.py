@@ -55,7 +55,7 @@ if __name__ == "__main__":
     path = "./dish_zenith.txt"
     a, x0, y0, z0, cov = photogrammetry(path)
     print(a, x0, y0, z0)
-    print(cov)
+
     uncert_a = cov[0,0]
     f, f_err = 1/(4*a), np.sqrt(uncert_a/(4*a**2))
     print(f, f_err)

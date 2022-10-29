@@ -22,11 +22,9 @@ def get_spectrum(pars,lmax=3000):
     tt=cmb[:,0]    #you could return the full power spectrum here if you wanted to do say EE
     return tt[2:]
 
-
-plt.ion()
-
-pars=np.asarray([60,0.02,0.1,0.05,2.00e-9,1.0])
-planck=np.loadtxt('COM_PowerSpect_CMB-TT-full_R3.01.txt',skiprows=1)
+# [6.89999947e+01, 2.29923534e-02, 1.16861596e-01, 5.99904540e-02, 2.12653966e-09, 9.54636115e-01]
+pars=np.asarray([68.99999768737038, 0.023002002409811404, 0.11768442142511115, 0.05999504000212928, 2.1339305670152335e-09, 0.9527456127665442])
+planck=np.loadtxt('./mcmc/COM_PowerSpect_CMB-TT-full_R3.01.txt',skiprows=1)
 ell=planck[:,0]
 spec=planck[:,1]
 errs=0.5*(planck[:,2]+planck[:,3]);
@@ -36,9 +34,8 @@ resid=spec-model
 chisq=np.sum( (resid/errs)**2)
 print("chisq is ",chisq," for ",len(resid)-len(pars)," degrees of freedom.")
 #read in a binned version of the Planck PS for plotting purposes
-planck_binned=np.loadtxt('COM_PowerSpect_CMB-TT-binned_R3.01.txt',skiprows=1)
+planck_binned=np.loadtxt('./mcmc/COM_PowerSpect_CMB-TT-binned_R3.01.txt',skiprows=1)
 errs_binned=0.5*(planck_binned[:,2]+planck_binned[:,3]);
-plt.clf()
 plt.plot(ell,model)
 plt.errorbar(planck_binned[:,0],planck_binned[:,1],errs_binned,fmt='.')
-plt.show()
+plt.savefig("Question4_fit.png")

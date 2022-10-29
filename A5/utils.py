@@ -55,15 +55,16 @@ def newtons(data_vector, params, num_pts, iterations=25):
     cov_inv = np.identity(d_uncertainty.size)/(d_uncertainty**2)
     data = data_vector
     p_guess = np.copy(params)
-    spec = get_spectrum(p_guess)[:number_of_points]
-    r = data - spec
-    r = np.matrix(r).transpose()
 
     # Beginning of the Newton's method loop
     for i in range(iterations):
+        spec = get_spectrum(p_guess)[:num_pts]
+        r = data - spec
+        r = np.matrix(r).transpose()
         # Calculate gradient and inverse covariance matrix
         grad = model_params(p_guess, num_pts)
         grad = np.matrix(grad)
+        # Chilling
         dp = np.linalg.pinv(grad.transpose()*cov_inv*grad)*(grad.transpose()*cov_inv*r)
         for j in range(len(p_guess)):
             p_guess[j] += dp[j]
@@ -104,9 +105,7 @@ def mcmc(params, data, function, noise, step_size, num_steps=1000):
             chisq_i = chisq_f
          
         # Saving the parameters and chisquares to some output arrays    
-        chain[i,:] = params
-        chisq_vector[i] = chisq_i
-        print("Params:", params, "Chi^2", chisq_i, "iteration: ", i)
+      
     
     return chain, chisq_vector
 
@@ -118,10 +117,6 @@ def chi_sq(params, data, noise):
 def chi_sq_constrained(params, data, noise):
     # Unconstrained chi squared
     chisq = chi_sq(params, data, noise)
-    chisq_optical = ((params[3]))
-
-    pass
-
-# MCMC with repolarization constraint
-def mcmc_repol():
-    pass
+    chisq_optical = ((params[3] - tau)**2/(tau_error**2))
+    chisq_tot = chisq + chisq_optical
+    return chisq_tot

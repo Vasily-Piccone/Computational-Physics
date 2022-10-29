@@ -1,0 +1,25 @@
+{
+    "python.autoComplete.extraPaths": ["./path-to-your-code"],
+    "python.analysis.packageIndexDepths": [
+
+        {
+            "name": "sklearn",
+            "depth": 2
+        },
+        {
+            "name": "matplotlib",
+            "depth": 2
+        },
+        {
+            "name": "scipy",
+            "depth": 2
+        },
+        {
+            "name": "django",
+            "depth": 2
+        }
+    ],
+    "python.analysis.extraPaths": [
+        "./path-to-your-code"
+    ]
+}
